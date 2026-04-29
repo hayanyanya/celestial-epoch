@@ -5,7 +5,6 @@ import { AnimatePresence, motion, useScroll, useTransform, useInView } from 'fra
 import { Sparkles, Sun, Sunset, Waves, ArrowDown } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import StarBackground from './components/StarBackground'
-import { supabase } from '../lib/supabase'
 
 const ZodiacFlash = dynamic(() => import('./components/ZodiacFlash'), { ssr: false })
 
@@ -158,21 +157,26 @@ export default function Home() {
   const handleSubmitForm = async () => {
     if (!name.trim() || !phone.trim()) return
     setSubmitError(false)
-    const { error } = await supabase.from('survey_submissions').insert({
-      belief: answers[1],
-      zodiac: answers[2],
-      mbti: answers[3],
-      life_area: answers[4],
-      card_result: selectedResult?.title ?? null,
-      name: name.trim(),
-      phone: phone.trim(),
-    })
-    if (error) {
-      console.error('Supabase insert error:', error)
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          belief: answers[1],
+          zodiac: answers[2],
+          mbti: answers[3],
+          life_area: answers[4],
+          card_result: selectedResult?.title ?? null,
+          name: name.trim(),
+          phone: phone.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (!json.ok) { setSubmitError(true); return }
+      setSubmitted(true)
+    } catch {
       setSubmitError(true)
-      return
     }
-    setSubmitted(true)
   }
 
   const handleRestart = () => {
