@@ -295,7 +295,7 @@ export default function Home() {
                   </div>
                   <div className="mt-12 flex justify-center">
                     <button
-                      onClick={handleNext}
+                      onClick={() => handleNext()}
                       className="px-10 py-4 bg-black text-white rounded-full hover:bg-slate-800 transition-colors text-lg font-medium cursor-pointer"
                     >
                       {current.btn}
