@@ -156,7 +156,7 @@ export default function Home() {
 
   const handleSubmitForm = async () => {
     if (!name.trim() || !phone.trim()) return
-    await supabase.from('survey_submissions').insert({
+    const { error } = await supabase.from('survey_submissions').insert({
       belief: answers[1],
       zodiac: answers[2],
       mbti: answers[3],
@@ -165,6 +165,7 @@ export default function Home() {
       name: name.trim(),
       phone: phone.trim(),
     })
+    if (error) console.error('Supabase insert error:', error)
     setSubmitted(true)
   }
 
