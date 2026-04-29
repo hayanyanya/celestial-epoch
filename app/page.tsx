@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useScroll, useTransform, useInView } from 'fra
 import { Sparkles, Sun, Sunset, Waves, ArrowDown } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import StarBackground from './components/StarBackground'
+import { supabase } from '../lib/supabase'
 
 const ZodiacFlash = dynamic(() => import('./components/ZodiacFlash'), { ssr: false })
 
@@ -123,6 +124,7 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [answers, setAnswers] = useState<Record<number, string>>({})
 
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll()
@@ -136,7 +138,10 @@ export default function Home() {
   const isResult = step >= steps.length
   const progressPct = step === 0 ? 0 : Math.round((step / (steps.length - 1)) * 100)
 
-  const handleNext = () => setStep(s => s + 1)
+  const handleNext = (answer?: string) => {
+    if (answer !== undefined) setAnswers(prev => ({ ...prev, [step]: answer }))
+    setStep(s => s + 1)
+  }
 
   const handleCardPick = () => {
     if (flipping) return
@@ -149,6 +154,20 @@ export default function Home() {
     }, 2500)
   }
 
+  const handleSubmitForm = async () => {
+    if (!name.trim() || !phone.trim()) return
+    await supabase.from('survey_submissions').insert({
+      belief: answers[1],
+      zodiac: answers[2],
+      mbti: answers[3],
+      life_area: answers[4],
+      card_result: selectedResult?.title ?? null,
+      name: name.trim(),
+      phone: phone.trim(),
+    })
+    setSubmitted(true)
+  }
+
   const handleRestart = () => {
     setStep(0)
     setSelectedResult(null)
@@ -156,6 +175,7 @@ export default function Home() {
     setSubmitted(false)
     setName('')
     setPhone('')
+    setAnswers({})
   }
 
   // ── 인트로: 스크롤 랜딩페이지 ──
@@ -415,7 +435,7 @@ export default function Home() {
                         key={opt}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
-                        onClick={handleNext}
+                        onClick={() => handleNext(opt)}
                         className="p-3 text-sm rounded-xl transition-all duration-200 cursor-pointer"
                         style={{
                           background: 'rgba(255,255,255,0.04)',
@@ -579,7 +599,7 @@ export default function Home() {
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => { if (name.trim() && phone.trim()) setSubmitted(true) }}
+                      onClick={handleSubmitForm}
                       className="w-full py-3 rounded-xl text-sm tracking-wide transition-all duration-300 cursor-pointer"
                       style={{
                         background: (name.trim() && phone.trim()) ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
