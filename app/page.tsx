@@ -122,6 +122,7 @@ export default function Home() {
   const [flipping, setFlipping] = useState(false)
   const [showZodiac, setShowZodiac] = useState(true)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [answers, setAnswers] = useState<Record<number, string>>({})
@@ -156,6 +157,7 @@ export default function Home() {
 
   const handleSubmitForm = async () => {
     if (!name.trim() || !phone.trim()) return
+    setSubmitError(false)
     const { error } = await supabase.from('survey_submissions').insert({
       belief: answers[1],
       zodiac: answers[2],
@@ -165,7 +167,11 @@ export default function Home() {
       name: name.trim(),
       phone: phone.trim(),
     })
-    if (error) console.error('Supabase insert error:', error)
+    if (error) {
+      console.error('Supabase insert error:', error)
+      setSubmitError(true)
+      return
+    }
     setSubmitted(true)
   }
 
@@ -610,6 +616,9 @@ export default function Home() {
                     >
                       보다 정확한 카드가 궁금해요
                     </motion.button>
+                    {submitError && (
+                      <p className="text-red-400 text-xs text-center mt-2">저장 중 오류가 발생했습니다. 다시 시도해주세요.</p>
+                    )}
                   </>
                 )}
               </motion.div>
