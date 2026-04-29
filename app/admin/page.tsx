@@ -68,7 +68,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="bg-slate-900 border border-slate-700 rounded-2xl p-10 w-full max-w-sm flex flex-col gap-5">
           <h1 className="text-white text-2xl font-bold text-center tracking-wide">관리자 로그인</h1>
-          <p className="text-slate-400 text-sm text-center">celestial2026 입력</p>
+          <p className="text-slate-400 text-sm text-center">pw:celestial2026</p>
           <input
             type="password"
             placeholder="비밀번호를 입력하세요"
