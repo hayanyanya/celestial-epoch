@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { AnimatePresence, motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Sparkles, Sun, Sunset, Waves, ArrowDown } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -10,7 +10,7 @@ const ZodiacFlash = dynamic(() => import('./components/ZodiacFlash'), { ssr: fal
 
 interface SurveyStep {
   id: string | number
-  type?: 'intro' | 'card-pick'
+  type?: 'intro' | 'card-pick' | 'landing'
   title?: string
   subtitle?: string
   btn?: string
@@ -29,6 +29,10 @@ interface Result {
 }
 
 const steps: SurveyStep[] = [
+  {
+    id: 'landing',
+    type: 'landing',
+  },
   {
     id: 'intro',
     type: 'intro',
@@ -125,6 +129,7 @@ export default function Home() {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [fadeInVisible, setFadeInVisible] = useState<boolean[]>([])
 
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll()
@@ -134,6 +139,7 @@ export default function Home() {
   const starOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [1, 0, 0])
 
   const current = steps[step]
+  const isLanding = current?.type === 'landing'
   const isIntro = current?.type === 'intro'
   const isResult = step >= steps.length
   const progressPct = step === 0 ? 0 : Math.round((step / (steps.length - 1)) * 100)
@@ -189,22 +195,108 @@ export default function Home() {
     setAnswers({})
   }
 
-  // ── 인트로: 스크롤 랜딩페이지 ──
+  // Landing Page
+  if (isLanding) {
+    return (
+      <div className="min-h-screen bg-[#2b1d12] text-[#e8e4d9] overflow-hidden" style={{ fontFamily: "'Special Elite', system-ui, serif" }}>
+        {/* Hero */}
+        <section className="h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+          <svg className="absolute w-96 h-96 -top-20 -left-20 fill-[#b5a642] opacity-10 animate-spin" style={{ animationDuration: '20s' }} viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.488.488 0 0 0 14 2h-4c-.25 0-.46.18-.49.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.12.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.66.07 1l-2.11 1.63c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.37-2.65c.63-.25 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.63z"/></svg>
+
+          <div className="z-10 text-center space-y-8">
+            <div>
+              <p className="text-[#b87333] tracking-[0.4em] text-sm mb-4 uppercase">Industrial Divination</p>
+              <h1 style={{ fontFamily: "'Nanum Myeongjo'" }} className="text-5xl md:text-8xl font-bold text-[#b5a642] drop-shadow-lg">
+                황동의 <span className="text-[#b87333] italic">신탁</span>
+              </h1>
+              <div className="w-40 h-1 bg-gradient-to-r from-transparent via-[#b87333] to-transparent mx-auto my-10"></div>
+              <p className="max-w-md mx-auto text-lg leading-relaxed opacity-80 italic">
+                "증기와 태엽이 맞물려 돌아가는 소리, <br /> 기계 장치 속에 감춰진 당신의 운명을 해독합니다."
+              </p>
+            </div>
+            <div className="pt-10 flex flex-col items-center gap-4">
+              <div className="w-1 h-16 bg-gradient-to-b from-[#b5a642] to-transparent"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mechanism */}
+        <section className="py-32 px-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+            <div className="flex justify-center">
+              <div className="border-8 border-[#b87333] w-72 h-[450px] bg-[#1a120b] p-1 shadow-2xl relative">
+                <div className="absolute w-[10px] h-[10px] bg-[#b5a642] rounded-full top-2 left-2 shadow-inner"></div>
+                <div className="absolute w-[10px] h-[10px] bg-[#b5a642] rounded-full top-2 right-2 shadow-inner"></div>
+                <div className="absolute w-[10px] h-[10px] bg-[#b5a642] rounded-full bottom-2 left-2 shadow-inner"></div>
+                <div className="absolute w-[10px] h-[10px] bg-[#b5a642] rounded-full bottom-2 right-2 shadow-inner"></div>
+
+                <div className="w-full h-full border border-[#b5a642]/20 flex flex-col items-center justify-center space-y-6">
+                  <svg className="w-24 h-24 fill-[#b87333] opacity-40 animate-spin" style={{ animationDuration: '10s' }} viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                  <p className="text-[#b5a642] text-xs tracking-widest uppercase">Steam-Powered Tarot</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-10">
+              <h2 style={{ fontFamily: "'Nanum Myeongjo'" }} className="text-3xl md:text-5xl font-bold text-[#b5a642]">
+                정교한 <br /><span className="text-[#b87333]">기계식 영감</span>
+              </h2>
+              <p className="text-lg leading-loose text-stone-400 break-keep">
+                우리는 모호한 마법 대신, <strong>논리적이고 정교한 기계 장치</strong>로 타로를 해석합니다.
+                3D 펜으로 직접 부품을 빚어내듯, 당신의 미래를 구성하는 톱니바퀴들을 하나씩 조립해 보세요.
+                거친 금속의 질감 속에 숨겨진 가장 따뜻한 지혜를 발견하게 될 것입니다.
+              </p>
+              <div className="pt-6">
+                <button onClick={() => handleNext()} className="px-12 py-4 bg-[#b87333] text-[#2b1d12] font-bold uppercase tracking-widest hover:bg-[#b5a642] transition-colors shadow-lg">
+                  장치 가동하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Spec */}
+        <section className="py-40 border-t border-[#b5a642]/10 bg-black/20">
+          <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div className="space-y-4">
+              <div className="text-[#b5a642] text-3xl">⚙</div>
+              <h4 className="font-bold text-[#b87333]">PRECISION</h4>
+              <p className="text-xs text-stone-500 uppercase leading-relaxed">0.01mm 오차 없는 <br />운명의 설계</p>
+            </div>
+            <div className="space-y-4">
+              <div className="text-[#b5a642] text-3xl">⚒</div>
+              <h4 className="font-bold text-[#b87333]">HANDCRAFT</h4>
+              <p className="text-xs text-stone-500 uppercase leading-relaxed">손끝에서 완성되는 <br />아날로그적 진실</p>
+            </div>
+            <div className="space-y-4">
+              <div className="text-[#b5a642] text-3xl">♨</div>
+              <h4 className="font-bold text-[#b87333]">PRESSURE</h4>
+              <p className="text-xs text-stone-500 uppercase leading-relaxed">강력한 직관의 <br />증기 에너지</p>
+            </div>
+          </div>
+        </section>
+
+        <footer className="py-20 text-center opacity-30 text-[10px] tracking-[0.8em]">
+          © 2026 THE STEAMPUNK ORACLE WORKS.
+        </footer>
+      </div>
+    )
+  }
+
+  // Intro Page
   if (isIntro) {
     return (
       <motion.div ref={containerRef} style={{ backgroundColor }} className="relative">
         {showZodiac && <ZodiacFlash onComplete={() => setShowZodiac(false)} />}
 
-        {/* Section 1: 밤하늘 인트로 */}
+        {/* Section 1 */}
         <section className="relative h-screen w-full flex flex-col items-center justify-center">
-          {/* 별 + 글로우 — 스크롤하면 페이드 아웃 */}
           <motion.div style={{ opacity: starOpacity }} className="absolute inset-0 pointer-events-none overflow-hidden">
             <StarBackground />
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-indigo-900/20 rounded-full blur-3xl rotate-12" />
             <div className="absolute bottom-1/4 left-1/3 w-[600px] h-[150px] bg-purple-900/20 rounded-full blur-3xl -rotate-6" />
           </motion.div>
 
-          {/* 제목 */}
           <motion.div
             initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.05 }}
             animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
@@ -216,8 +308,7 @@ export default function Home() {
               style={{
                 fontFamily: 'Georgia, serif',
                 color: 'rgba(255,255,255,0.96)',
-                textShadow:
-                  '0 0 6px rgba(255,255,255,1), 0 0 18px rgba(255,255,255,0.95), 0 0 40px rgba(255,255,255,0.7), 0 0 80px rgba(255,255,255,0.45), 0 0 140px rgba(255,255,255,0.2)',
+                textShadow: '0 0 6px rgba(255,255,255,1), 0 0 18px rgba(255,255,255,0.95), 0 0 40px rgba(255,255,255,0.7), 0 0 80px rgba(255,255,255,0.45), 0 0 140px rgba(255,255,255,0.2)',
               }}
             >
               {current.title}
@@ -234,7 +325,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* 스크롤 안내 */}
+          {/* Scroll Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -247,403 +338,247 @@ export default function Home() {
               transition={{ repeat: Infinity, duration: 2 }}
               className="flex flex-col items-center"
             >
-              <ArrowDown className="w-7 h-7" strokeWidth={2.5} />
+              <ArrowDown className="w-7 h-7 strokeWidth-[2.5]" />
             </motion.div>
           </motion.div>
         </section>
 
-        {/* Section 2: 서사 + 프로젝트 홍보 */}
-        <section className="relative min-h-screen w-full flex items-center justify-center py-32 px-6">
-          <div className="max-w-4xl w-full">
-            <motion.div style={{ color: textColor }} className="space-y-24">
-
-              <FadeInSection>
-                <h2 className="text-3xl md:text-5xl font-serif mb-8 border-l-4 border-amber-400 pl-6">
-                  기억의 심연에서 길어 올린 별의 기록
+        {/* Section 2 */}
+        <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-6 py-20 bg-gradient-to-b from-transparent to-slate-100">
+          <FadeInSection>
+            <div className="max-w-2xl mx-auto text-center space-y-16">
+              <div className="space-y-6">
+                <p className="text-slate-600 text-sm tracking-widest uppercase">당신의 여정</p>
+                <h2 className="text-4xl md:text-6xl font-bold text-slate-900 leading-tight">
+                  기억의 심연에서<br />길어 올린 별의 기록
                 </h2>
-                <p className="text-xl md:text-2xl leading-relaxed font-light opacity-90">
-                  인류는 아주 오래전부터 밤하늘의 성좌를 읽으며 운명의 지도를 그려왔습니다.
-                  그 복잡하고 신비로운 궤적 속에는 우리가 잊고 지냈던 수많은 해답이 숨겨져 있습니다.
-                </p>
-              </FadeInSection>
+              </div>
 
-              <FadeInSection>
-                <div className="bg-white/40 backdrop-blur-md border border-black/5 p-10 md:p-16 rounded-[2rem] shadow-2xl shadow-black/5">
-                  <h3 className="text-4xl font-serif mb-8 text-black leading-snug">
-                    고대의 지혜,<br />현대의 감각으로 다시 태어나다.
-                  </h3>
-                  {/* 직관 · 감각 · 상징 카드 */}
-                  <div className="grid grid-cols-3 gap-4 mb-10">
-                    {[
-                      { word: '직관', symbol: '◈', sub: 'Intuition' },
-                      { word: '감각', symbol: '❋', sub: 'Sensation' },
-                      { word: '상징', symbol: '⟡', sub: 'Symbol' },
-                    ].map(({ word, symbol, sub }) => (
-                      <div
-                        key={word}
-                        className="flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border border-black/10"
-                        style={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)' }}
-                      >
-                        <span className="text-2xl text-slate-400">{symbol}</span>
-                        <span className="text-xl font-serif font-medium text-black">{word}</span>
-                        <span className="text-xs tracking-widest text-slate-400 uppercase">{sub}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-6 text-lg text-slate-800 leading-relaxed">
-                    <p>
-                      저희는 모호하고 어려운 고전 점성술의 상징을 가장{' '}
-                      <strong>직관적이고 감각적인 언어</strong>로 재해석하고 있습니다.
-                    </p>
-                    <p>
-                      단순한 도구를 넘어, 누구나 자신의 내면을 선명하게 들여다볼 수 있도록 설계된 새로운 카드덱은
-                      예술적 영감과 데이터 알고리즘을 결합하여 제작됩니다.
-                    </p>
-                    <p className="font-medium text-black pt-4">
-                      당신의 손끝에서 완성되는 새로운 별의 문장을 곧 만나보십시오.
-                    </p>
-                  </div>
-                  <div className="mt-12 flex justify-center">
-                    <button
-                      onClick={() => handleNext()}
-                      className="px-10 py-4 bg-black text-white rounded-full hover:bg-slate-800 transition-colors text-lg font-medium cursor-pointer"
-                    >
-                      {current.btn}
-                    </button>
-                  </div>
+              <div className="grid grid-cols-3 gap-6 py-12">
+                <div className="rounded-2xl border border-slate-300 bg-white p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                  <p className="text-5xl mb-4">💫</p>
+                  <p className="text-sm font-semibold text-slate-700">직관</p>
                 </div>
-              </FadeInSection>
+                <div className="rounded-2xl border border-slate-300 bg-white p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                  <p className="text-5xl mb-4">🎨</p>
+                  <p className="text-sm font-semibold text-slate-700">감각</p>
+                </div>
+                <div className="rounded-2xl border border-slate-300 bg-white p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                  <p className="text-5xl mb-4">📖</p>
+                  <p className="text-sm font-semibold text-slate-700">상징</p>
+                </div>
+              </div>
 
-            </motion.div>
-          </div>
+              <div className="pt-8">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleNext()}
+                  className="px-12 py-4 bg-black text-white rounded-full font-semibold hover:bg-slate-800 transition-colors shadow-lg"
+                >
+                  설문 시작하기
+                </motion.button>
+              </div>
+            </div>
+          </FadeInSection>
         </section>
 
-        {/* Footer */}
-        <footer className="h-40 flex items-center justify-center" style={{ opacity: 0.3 }}>
-          <motion.p style={{ color: textColor }} className="text-sm">
-            © 2026 Celestial Epoch. All rights reserved.
-          </motion.p>
+        <footer className="py-12 text-center text-slate-500 text-xs tracking-widest">
+          © 2026 Celestial Epoch. All rights reserved.
         </footer>
       </motion.div>
     )
   }
 
-  // ── 질문 / 결과 페이지 (기존 그대로) ──
-  return (
-    <div
-      className={`min-h-screen w-full flex flex-col items-center overflow-x-hidden relative p-4 ${isResult ? 'justify-start pt-16' : 'justify-center'}`}
-      style={{ background: '#020617' }}
-    >
-      <StarBackground />
-
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-indigo-900/20 rounded-full blur-3xl rotate-12" />
-        <div className="absolute bottom-1/4 left-1/3 w-[600px] h-[150px] bg-purple-900/20 rounded-full blur-3xl -rotate-6" />
-      </div>
-
-      {/* 진행 바 */}
-      {step > 0 && step < steps.length && (
-        <div className="absolute top-6 w-full max-w-xl px-8 z-20">
-          <div className="h-[2px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: 'linear-gradient(to right, rgba(245,158,11,1), rgba(253,224,71,1))' }}
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPct}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-          <p className="text-right text-xs mt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>{progressPct}%</p>
+  // Survey Pages
+  if (!isResult) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden relative p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Progress Bar */}
+        <div className="fixed top-0 left-0 right-0 h-1 bg-slate-700 z-50">
+          <motion.div
+            initial={{ width: '0%' }}
+            animate={{ width: `${progressPct}%` }}
+            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+          />
         </div>
-      )}
 
-      <div className="relative z-20 w-full max-w-xl">
         <AnimatePresence mode="wait">
-          {!isResult ? (
+          {current?.q && (
             <motion.div
               key={step}
               variants={hazeVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full"
+              className="max-w-2xl w-full space-y-12"
             >
-              {/* ── 카드 선택 ── */}
-              {current.type === 'card-pick' ? (
-                <div className="text-center space-y-12">
-                  <h2
-                    className="text-2xl leading-relaxed"
-                    style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.92)' }}
-                  >
-                    {current.q}
-                  </h2>
-                  <div className="flex justify-center gap-6">
-                    {[0, 1, 2].map(i => (
-                      <motion.div
-                        key={i}
-                        whileHover={{ y: -14, scale: 1.05 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={handleCardPick}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                        className="w-32 h-52 rounded-2xl cursor-pointer relative overflow-hidden group"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-                          border: '1.5px solid rgba(255,255,255,0.2)',
-                          boxShadow: '0 0 20px rgba(255,255,255,0.05)',
-                        }}
-                      >
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-20 h-20 rounded-full border flex items-center justify-center"
-                            style={{ borderColor: 'rgba(255,255,255,0.15)' }}>
-                            <div className="w-12 h-12 rounded-full border flex items-center justify-center"
-                              style={{ borderColor: 'rgba(255,255,255,0.15)' }}>
-                              <Sparkles className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.3)' }} />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute top-3 left-1/2 -translate-x-1/2 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>✦</div>
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>✦</div>
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </motion.div>
-                    ))}
-                  </div>
-                  <AnimatePresence>
-                    {flipping && (
-                      <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm tracking-widest italic"
-                        style={{ color: 'rgba(255,255,255,0.5)' }}
-                      >
-                        ✦ 카드를 뒤집는 중... ✦
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
+              {/* Question */}
+              <div className="text-center space-y-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+                  {current.q}
+                </h2>
+              </div>
 
-              /* ── 일반 질문 ── */
-              ) : (
-                <div
-                  className="rounded-3xl p-8"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <h2
-                    className="text-2xl mb-8 text-center leading-relaxed"
-                    style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.92)' }}
+              {/* Options */}
+              <div className={`grid ${current.layout} gap-4 w-full`}>
+                {current.options?.map((opt, i) => (
+                  <motion.button
+                    key={i}
+                    whileHover={{ scale: 1.02, translateY: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleNext(opt)}
+                    className="px-6 py-4 rounded-2xl text-center font-semibold transition-all duration-300 border-2 border-slate-600 text-white hover:border-indigo-400 hover:bg-indigo-500/10"
                   >
-                    {current.q}
-                  </h2>
-                  <div className={`grid ${current.layout} gap-3`}>
-                    {current.options?.map(opt => (
-                      <motion.button
-                        key={opt}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => handleNext(opt)}
-                        className="p-3 text-sm rounded-xl transition-all duration-200 cursor-pointer"
-                        style={{
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: 'rgba(255,255,255,0.8)',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'
-                          e.currentTarget.style.color = 'rgba(255,255,255,1)'
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                          e.currentTarget.style.color = 'rgba(255,255,255,0.8)'
-                        }}
-                      >
-                        {opt}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    {opt}
+                  </motion.button>
+                ))}
+              </div>
             </motion.div>
+          )}
 
-          /* ── 결과 화면 ── */
-          ) : (
+          {current?.type === 'card-pick' && (
             <motion.div
-              key="result"
+              key={step}
               variants={hazeVariants}
               initial="initial"
               animate="animate"
-              className="text-center w-full max-w-md mx-auto pb-12"
+              exit="exit"
+              className="max-w-2xl w-full space-y-12 text-center"
             >
-              {/* 헤더 */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="text-sm tracking-[0.3em] uppercase mb-4"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
-                ✦ Your Card ✦
-              </motion.p>
-              <h2
-                className="text-xl mb-8"
-                style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.85)' }}
-              >
-                당신의 내일을 비추는 풍경
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white">{current.q}</h2>
 
-              {/* 결과 카드 */}
-              <motion.div
-                initial={{ scale: 0.85, opacity: 0, rotateY: 90 }}
-                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
-                className={`w-72 mx-auto rounded-3xl bg-gradient-to-br ${selectedResult?.color} flex flex-col items-center justify-center p-8 shadow-2xl ${selectedResult?.glow} relative overflow-hidden mb-4`}
-              >
-                <div
-                  className="absolute top-0 left-0 w-full h-1/2 rounded-t-3xl"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%)' }}
-                />
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                  className="mb-5"
-                >
-                  {selectedResult?.icon}
-                </motion.div>
-                <p className="text-xl font-serif text-white leading-relaxed break-keep text-center mb-4">
-                  {selectedResult?.title}
-                </p>
-                <div className="w-16 h-px mb-4" style={{ background: 'rgba(255,255,255,0.3)' }} />
-                <p className="text-xs text-white/80 leading-relaxed break-keep text-center">
-                  {selectedResult?.description}
-                </p>
-              </motion.div>
-
-              {/* 메시지 */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="text-sm leading-relaxed px-4 mb-10"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
-                {selectedResult?.message}
-              </motion.p>
-
-              {/* 문의 폼 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.0 }}
-                className="rounded-2xl p-6 mx-2"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                }}
-              >
-                {submitted ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="py-4 space-y-3"
-                  >
-                    <p className="text-2xl">✦</p>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                      문의가 접수되었습니다.<br />곧 연락드리겠습니다.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <>
-                    <p className="text-sm mb-5 tracking-wide" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      더 깊은 카드 해석을 원하신다면
-                    </p>
-                    <div className="space-y-3 mb-5">
-                      <input
-                        type="text"
-                        placeholder="이름"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          color: 'rgba(255,255,255,0.9)',
-                        }}
-                        onFocus={e => {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                        }}
-                        onBlur={e => {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
-                        }}
-                      />
-                      <input
-                        type="tel"
-                        placeholder="전화번호"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          color: 'rgba(255,255,255,0.9)',
-                        }}
-                        onFocus={e => {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                        }}
-                        onBlur={e => {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
-                        }}
-                      />
-                    </div>
+              {!selectedResult ? (
+                <div className="grid grid-cols-3 gap-6">
+                  {results.map((result, i) => (
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={handleSubmitForm}
-                      className="w-full py-3 rounded-xl text-sm tracking-wide transition-all duration-300 cursor-pointer"
-                      style={{
-                        background: (name.trim() && phone.trim()) ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        color: (name.trim() && phone.trim()) ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.35)',
-                      }}
+                      key={i}
+                      whileHover={{ scale: 1.05, rotateY: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleCardPick}
+                      className="h-64 rounded-2xl border-4 border-indigo-500 bg-gradient-to-br from-slate-800 to-slate-900 flex flex-col items-center justify-center space-y-4 hover:border-indigo-300 transition-colors p-4"
                     >
-                      보다 정확한 카드가 궁금해요
+                      {result.icon}
+                      <p className="text-sm font-semibold text-slate-300">{result.title}</p>
                     </motion.button>
-                    {submitError && (
-                      <p className="text-red-400 text-xs text-center mt-2">저장 중 오류가 발생했습니다. 다시 시도해주세요.</p>
-                    )}
-                  </>
-                )}
-              </motion.div>
-
-              {/* 재시작 */}
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.4 }}
-                onClick={handleRestart}
-                className="mt-8 text-sm underline underline-offset-4 transition-colors duration-200 cursor-pointer block mx-auto"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)' }}
-              >
-                돌아가기
-              </motion.button>
+                  ))}
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ scale: 0, rotateY: 180 }}
+                  animate={{ scale: 1, rotateY: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="space-y-6"
+                >
+                  <div className="flex justify-center">{selectedResult.icon}</div>
+                  <h3 className="text-3xl font-bold text-indigo-300">{selectedResult.title}</h3>
+                  <p className="text-lg text-slate-300 leading-relaxed">{selectedResult.message}</p>
+                </motion.div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </div>
-  )
+    )
+  }
+
+  // Result Page
+  if (isResult) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-start overflow-x-hidden relative p-4 pt-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-2xl w-full space-y-12"
+        >
+          {!submitted ? (
+            <>
+              {/* Result Display */}
+              <div className="text-center space-y-8">
+                <div className="flex justify-center">{selectedResult?.icon}</div>
+                <h2 className="text-4xl md:text-5xl font-bold text-white">{selectedResult?.title}</h2>
+                <p className="text-xl text-slate-300 leading-relaxed">{selectedResult?.message}</p>
+                <div className="pt-6 p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                  <p className="text-base text-slate-200">{selectedResult?.description}</p>
+                </div>
+              </div>
+
+              {/* Contact Form */}
+              <div className="space-y-6 pt-8">
+                <p className="text-center text-slate-300 font-semibold">더 깊은 해석을 원하신다면</p>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="이름"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      color: 'rgba(255,255,255,0.9)',
+                    }}
+                  />
+                  <input
+                    type="tel"
+                    placeholder="전화번호"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      color: 'rgba(255,255,255,0.9)',
+                    }}
+                  />
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleSubmitForm}
+                  className="w-full py-3 rounded-xl text-sm tracking-wide transition-all duration-300 cursor-pointer"
+                  style={{
+                    background: (name.trim() && phone.trim()) ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: (name.trim() && phone.trim()) ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.35)',
+                  }}
+                >
+                  보다 정확한 카드가 궁금해요
+                </motion.button>
+                {submitError && (
+                  <p className="text-red-400 text-xs text-center mt-2">저장 중 오류가 발생했습니다. 다시 시도해주세요.</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center space-y-8 py-20"
+            >
+              <p className="text-3xl font-bold text-indigo-300">문의가 접수되었습니다</p>
+              <p className="text-slate-300">곧 연락드리겠습니다.</p>
+            </motion.div>
+          )}
+
+          {/* Restart Button */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4 }}
+            onClick={handleRestart}
+            className="mt-8 text-sm underline underline-offset-4 transition-colors duration-200 cursor-pointer block mx-auto"
+            style={{ color: 'rgba(255,255,255,0.3)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)' }}
+          >
+            돌아가기
+          </motion.button>
+        </motion.div>
+      </div>
+    )
+  }
+
+  return null
 }
